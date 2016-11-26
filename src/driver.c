@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <treeLib.h>
-#include <strRecord.h>
+#include "strRecord.h"
 #include <driver.h>
 
 void delete(void* data)
@@ -28,6 +28,10 @@ void print(void* d)
 {
 	StrRec* s;
 
+	if(d == NULL)
+	{
+		return;
+	}
 	s = (StrRec*)d;
 	printf("Key: %s, Frequency: %d\n",s->string,s->count);
 }
@@ -36,6 +40,10 @@ void incEq(void* d)
 {
 	StrRec* s;
 	s = (StrRec*)d;
+	if(d == NULL)
+	{
+		return;
+	}
 	incriment(s);
 }
 

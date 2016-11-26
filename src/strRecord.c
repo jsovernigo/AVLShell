@@ -11,7 +11,7 @@
  *	measure the frequency fo a string's occurence in a file.
  */
 
-#include <strRecord.h>
+#include "strRecord.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

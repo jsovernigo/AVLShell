@@ -1,6 +1,6 @@
 CC		=gcc
 CFLAGS	=-Wall -pedantic -std=c99 -g
-OBJECTS	=driver.o avltree.o treeLib.o strRecord.o
+OBJECTS	=driver.o treeLib.o strRecord.o avltree.o
 EXEC 	=avltree
 COMP	=build
 FILES	=./src/driver.c ./src/avltree.c ./src/treeLib.c ./src/strRecord.c
@@ -29,11 +29,11 @@ $(COMP): $(OBJECTS)
 driver.o: ./src/driver.c $(wildcard include*.h)
 	$(CC) -c $(CFLAGS) -o $@ ./src/driver.c -I$(INCLUDE)
 
-avltree.o: ./src/avltree.c $(wildcard include*.h)
-	$(CC) -c $(CFLAGS) -o $@ ./src/avltree.c -I$(INCLUDE)
-
 treeLib.o: ./src/treeLib.c $(wildcard include*.h)
 	$(CC) -c $(CFLAGS) -o $@ ./src/treeLib.c -I$(INCLUDE)
+
+avltree.o: ./src/avltree.c $(wildcard include*.h)
+	$(CC) -c $(CFLAGS) -o $@ ./src/avltree.c -I$(INCLUDE)
 
 strRecord.o: ./src/strRecord.c $(wildcard include*.h)
 	$(CC) -c $(CFLAGS) -o $@ ./src/strRecord.c -I$(INCLUDE)
