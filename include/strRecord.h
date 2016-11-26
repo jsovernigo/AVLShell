@@ -58,29 +58,23 @@ int compare(void* rec1, void* rec2);
 
 /**
  * 	incriment
- * 	increases the counter of strrec by 1 if stringCompare is equal to the 
- * 	record's internal string.
- * 	IN:			strrec			- the string record that will be checked and
- * 								  compared to stringcompare
- * 				stringCompare	- a string that will be checked agains sttrec
+ * 	increases the counter of strrec by 1 
+ * 	IN:			strrec			- the string record that will be incrimented
  *	OUT:		void
- *	POST:		strrec->counter will have been incrimented, if stringcompare
- *				matched the string contained by the record itself.
- *	ERROR:		strrec is null, stringcompare is null.
+ *	POST:		strrec->counter will have been incrimented
+ *	ERROR:		strrec is null
  */
-void incriment(StrRec* strrec, char* stringCompare);
+void incriment(StrRec* strrec);
 
 /**
  * 	decriment
  * 	decreases the counter, should a string be required to decrease in frequency
  * 	IN:			strrec			- a string record pointer.
- * 				stringCompare	- a string that will be compared to the record
  * 	OUT:		void
- * 	POST:		strrec->counter could have been updated, if stringCompare
- * 				matches.
- *  ERROR:		strrec or stringCompare are null.
+ * 	POST:		strrec->counter could have been updated
+ *  ERROR:		strrec is null
  */
-void decriment(StrRec* strrec, char* stringCompare);
+void decriment(StrRec* strrec);
 
 /**
  *	matches

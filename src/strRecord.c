@@ -14,6 +14,7 @@
 #include <strRecord.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 StrRec* makeRecord(char* string)
 {
@@ -66,10 +67,12 @@ int compare(void* rc1, void* rc2)
 	result = 0;
 	if(rec1 == NULL || rec2 == NULL)
 	{
+		printf("Found Your Problem.");
 		return 0;
 	}
 	else if(rec1->string == NULL || rec2->string == NULL)
 	{
+		printf("Found Your Problem.");
 		return 0;
 	}
 
@@ -78,17 +81,17 @@ int compare(void* rc1, void* rc2)
 	return result;
 }
 
-void incriment(StrRec* strrec, char* stringCompare)
+void incriment(StrRec* strrec)
 {
-	if(matches(strrec, stringCompare) == 1)
+	if(strrec != NULL)
 	{
 		strrec->count++;
 	}
 }
 
-void decriment(StrRec* strrec, char* stringCompare)
+void decriment(StrRec* strrec)
 {
-	if(matches(strrec, stringCompare) == 1)
+	if(strrec != NULL)
 	{
 		strrec->count--;
 	}

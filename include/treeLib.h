@@ -1,3 +1,14 @@
+
+/**
+ *	Giuliano Sovernigo		0948924
+ *	gsoverni@mail.uoguelph.ca
+ *
+ *	CIS*2520				A4: AVL
+ *
+ *	This file contains definitions for common methods used in avl tree 
+ *	creation and maintenance.  The code for these is found in the cfile
+ *	of the same name.
+ */
 #ifndef __GSOVERNIGO_TREELIB_H__
 #define __GSOVERNIGO_TREELIB_H__
 
@@ -98,6 +109,37 @@ int inOrder(TNode* node, void (*action)(void*));
 int postOrder(TNode* node, void (*action)(void*));
 
 /**
+ *	find
+ *	finds a node that contains the match to data
+ *	IN:			node		- the node that we are operating on
+ *				data		- the data that must be matched to be returned
+ *				compare		- a function pointer to the compare the data nodes
+ *	OUT:		the first node found that validates compare for data, node->data
+ *	POST:		a node has been returned
+ *	ERROR:		anything is NULL.
+ */
+TNode* find(TNode* node, void* data, int (*compare)(void*,void*));
+
+
+/**
+ *	printAllMatchSpec
+ *	prints all nodes which conform to the return of integer 1 in matches. mcond
+ *	is the void* that root->data must conform to, according, again to matches.
+ *	IN:			root		- the root node that we are CURRENTLY operating on
+ *				matches		- a function pointer that acts similar to the 
+ *							  compare function, but returns 1 should root->data
+ *							  conform to mcond in a predefined manner.
+ *				mcond		- the other void pointer that "matches" the root
+ *							  data.
+ *				print		- the function pointer to the print function.
+ *	OUT:		void
+ *	POST:		all data in the tree conforming to mcond has been printed to
+ *				stdout.
+ *	ERROR:		where do I start... anything is null.
+ */
+void printAllMatchSpec(TNode* root, int (*matches)(void*, void*), void* mcond, void (*print)(void*));
+
+/**
  *	height
  *	calculates the height of the tree, returning the largest possible height.
  *	IN:			node		- root node to be measured.
@@ -106,6 +148,16 @@ int postOrder(TNode* node, void (*action)(void*));
  *	ERROR:		node is null, -1 returned.
  */
 int height(TNode* node);
+
+/**
+ *	size
+ *	returns the size of the tree.  All nodes.
+ *	IN:			node		- the node we are operating on.
+ *	OUT:		an integer size of the whole tree.
+ *	POST:		an integer has been returned
+ *	ERROR:		node is null
+ */
+int size(TNode* node);
 
 /**
  *	balanceFactor
@@ -155,13 +207,83 @@ TNode* rRotate(TNode* node);
 TNode* lRotate(TNode* node);
 
 /**
- *
+ *	rlRotate
+ *	rotates the node->left right, then node left.
+ *	IN:			node		- the node we are to rotate.
+ *	OUT:		return the rotated node
+ *	POST:		the node has been rotated
+ *	ERROR:		node is null or can NOT BE ROTATED RL (WILL segfault)
+ *	REF:		Information and concepts for rotations taken from:
+ *				http://emunix.emich.edu/~haynes/Papers/AVL/rotations.pdf
+ */
+TNode* rlRotate(TNode* node);
+
+/**
+ * 	lrRotate
+ *	rotates node->right, then node right.
+ *	IN:			node		- the node we can operate on.
+ *	OUT:		returns the properly rotated node.
+ *	POST:		node has been rotated
+ *	ERROR:		node is null or CANNOT BE ROTATED LR (WILL segfault)
+ *  REF:		Information and concepts for rotations taken from:
+ *				http://emunix.emich.edu/~haynes/Papers/AVL/rotations.pdf
+ */
+TNode* lrRotate(TNode* node);
+
+/**
+ *	add
+ *	adds node to tree, using compare to sort them, and equalaction,
+ *	should the node already exist.
+ *	IN:			tree		- the tree that will be added TO.
+ *				node		- the node that will be ADDED
+ *				compare		- the comparison function that wll be used
+ *				equalAction	- the function that outlines actions to be taken if
+ *							  the node is already existant.
+ *	OUT:		The balanced tree's root.
+ *	POST:		node has been added to tree, and tree has been balanced.
+ *	ERROR:		anything is null
  */
 TNode* add(TNode* tree, TNode* node, int (*compare)(void*,void*), void (*equalAction)(void*));
 
 /**
- *
+ * 	tRemove
+ * 	removes the node containing data from the tree.
+ *  IN:			tree		- the tree to be trimmed.
+ *  			data		- that data we are searching for
+ *  			compare		- the function that returns 0 if equal
+ *  OUT:		the tree, with the node containing data removed.
+ *  POST:		tree should be 1 node smaller.
+ *  ERROR:		anything is null.
+ */
+TNode* tRemove(TNode* tree, void* data, int (*compare)(void*, void*));
+
+/**
+ *	printTree
+ *	prints the tree to the screen, in the style of a file tree.
+ *	*NOTE*
+ *		-This function is purely for debugging purposes.  Do not use it for
+ *		normal operation.
+ *	IN:			tree		- the tree to be printed
+ *				level		- the level of the current node (call with 0)
+ *				print		- function pointer specification for printing
+ *							  tree->data
+ *	OUT:		0 on success.
+ *	POST:		tree has been printed to stdout
+ *	ERROR:		print is null.
  */
 int printTree(TNode* tree, int level, void (*print)(void*));
+
+/**
+ *	destroyTree
+ *	destroys and deallocates all tree nodes and their respective data to free
+ *	the space used up by the tree for further allocationa and circulation.
+ *	IN:			root		- the root of your tree.
+ *				destroy		- a function pointer that free root->data properly.
+ *	OUT:		void; why would I return anything? duh.
+ *	POST:		the tree root has been deallocated and should be treated with
+ *				the utmost caution.  NO TOUCHING.
+ *  ERROR:		destroy is null.
+ */
+void destroyTree(TNode* root, void (*destroy)(void*));
 
 #endif

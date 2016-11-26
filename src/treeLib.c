@@ -1,3 +1,14 @@
+/**
+ *	Giuliano Sovernigo		0948924
+ *	gsoverni@mail.uoguelph.ca
+ *
+ *	CIS*2520				A4: AVL
+ *
+ *	This file contains the code used to imliment an AVL tree that stores void pointers.
+ *	The header file of the same name contains the definitions and comments for the 
+ *	functions listed here.
+ */
+
 #include "treeLib.h"
 #include <stdio.h>
 #include <string.h>
@@ -21,11 +32,11 @@ TNode* makeNode(TNode* left, TNode* right, void* data)
 	return newNode;
 }
 
-void destroyData(TNode* TBD, void (*destroy)(void* data))
+void destroyNode(TNode* TBD, void (*destroy)(void* data))
 {
 	if(TBD == NULL)
 	{
-		if(destroy == NULL)
+		if(destroy == NULL) // essentially, this "cuts our losses", by at least freeing something
 		{
 			free(TBD->data);
 		}
@@ -115,6 +126,54 @@ int postOrder(TNode* node, void (*action)(void*))
 	return 1 + result;
 }
 
+TNode* find(TNode* node, void* data, int (*compare)(void*,void*))
+{
+	if(node == NULL)
+	{
+		return NULL;
+	}
+	else if(compare(getData(node), data) == 0)
+	{
+		return node;
+	}
+	else
+	{
+		TNode* found;
+
+		found = find(node->left, data, compare);
+		if(found != NULL)
+		{
+			return found;
+		}
+		
+		found = find(node->right, data, compare);
+		if(found != NULL)
+		{
+			return found;
+		}
+	}
+	return NULL;
+}
+
+void printAllMatchSpec(TNode* root, int (*matches)(void*, void*), void* mcond, void (*print)(void*))
+{
+	if(root == NULL)
+	{
+		return;
+	}
+	else if (matches == NULL || print == NULL)
+	{
+		return;
+	}
+	else if(matches(root->data,mcond) == 1)
+	{
+		print(root->data);
+	}
+	
+	printAllMatchSpec(root->left, matches, mcond, print);
+	printAllMatchSpec(root->right, matches, mcond, print);
+}
+
 int height(TNode* node)
 {
 	int heightl;
@@ -142,6 +201,19 @@ int height(TNode* node)
 		return 1 + heightr;
 	}
 	return 0;
+}
+
+int size(TNode* node)
+{
+	if(node == NULL)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1 + size(node->left) + size(node->right);
+	}	
+	return -1;
 }
 
 int balanceFactor(TNode* node)
@@ -182,21 +254,26 @@ TNode* balance(TNode* root)
 	
 	if(bfac > 1) // right heavy
 	{
-		if(balanceFactor(root->right) < 0)
+		if(balanceFactor(root->right) == -1)
 		{
-			root->right = rRotate(root->right);
+			root = rlRotate(root);
 		}
-		root = lRotate(root);
+		else
+		{
+			root = lRotate(root);
+		}
 	}
 	else if(bfac < -1) // left heavy
 	{
-		if(balanceFactor(root->left) > 0)
+		if(balanceFactor(root->left) == 1)
 		{
-			root->left = lRotate(root->left);
+			root = lrRotate(root);
 		}
-		root = rRotate(root);
+		else
+		{
+			root = rRotate(root);
+		}
 	}
-	
 	return root;
 }
 
@@ -232,13 +309,33 @@ TNode* lRotate(TNode* node)
 	return nRoot;
 }
 
+TNode* rlRotate(TNode* node)
+{
+	if(node == NULL)
+	{
+		return NULL;
+	}
+	node->right = rRotate(node->right);
+	return lRotate(node);
+}
+
+TNode* lrRotate(TNode* node)
+{
+	if(node == NULL)
+	{	
+		return NULL;
+	}
+	node->left = lRotate(node->left);
+	return rRotate(node);
+}
+
 TNode* add(TNode* tree, TNode* node, int (*compare)(void*,void*), void (*equalAction)(void*))
 {
 	int diff;
 
 	if(node == NULL || getData(node) == NULL)
 	{
-		return NULL;
+		return tree;
 	}
 	else if(tree == NULL || getData(tree) == NULL)
 	{
@@ -255,7 +352,7 @@ TNode* add(TNode* tree, TNode* node, int (*compare)(void*,void*), void (*equalAc
 		}		
 		return tree;
 	}
-	else if(diff < 0) // node belongs SOMEWHERE left of tree
+	else if(diff > 0) // node belongs SOMEWHERE left of tree
 	{
 		if(tree->left == NULL)
 		{
@@ -265,10 +362,9 @@ TNode* add(TNode* tree, TNode* node, int (*compare)(void*,void*), void (*equalAc
 		{
 			tree->left = add(tree->left, node, compare, equalAction);
 		}
-		//tree = balance(tree);
-		return tree;
+		return balance(tree);
 	}
-	else if(diff > 0) // node belongs SOMEWHERE right of tree.
+	else if(diff < 0) // node belongs SOMEWHERE right of tree.
 	{
 		if(tree->right == NULL) // we can just add
 		{
@@ -278,11 +374,80 @@ TNode* add(TNode* tree, TNode* node, int (*compare)(void*,void*), void (*equalAc
 		{
 			tree->right = add(tree->right, node, compare, equalAction);
 		}
-		//tree = balance(tree);
-		return tree;
+		return balance(tree);
 	}
 
-	return NULL;
+	return tree;
+}
+
+TNode* tRemove(TNode* tree, void* data, int (*compare)(void*,void*))
+{
+	if(tree == NULL)
+	{
+		return NULL;
+	}
+
+	if(compare(getData(tree), data) == 0)
+	{
+		if(tree->left == NULL && tree->right == NULL)
+		{
+			return NULL;
+		}
+		else if(tree->left == NULL || tree->right == NULL)
+		{
+			if(tree->left == NULL)
+			{
+				return tree->right;
+			}
+			else
+			{
+				return tree->left;
+			}
+		}
+		else
+		{
+			int lheight;
+			int rheight;
+
+			lheight = height(tree->left);
+			rheight = height(tree->right);
+
+			if(lheight > rheight)
+			{
+				TNode* lchild;
+				lchild = tree->left;
+				while(lchild->right != NULL)
+				{
+					lchild = lchild->right;
+				}
+				tRemove(tree->left, getData(lchild), compare);
+				lchild->left = tree->left;
+				lchild->right = tree->right;
+				return balance(lchild);
+			}
+			else
+			{
+				TNode* lchild;
+				lchild = tree->right;
+				while(lchild->left != NULL)
+				{
+					lchild = lchild->left;
+				}
+				tRemove(tree->right, getData(lchild), compare);
+				lchild->left = tree->left;
+				lchild->right = tree->right;
+				return balance(lchild);
+			}
+		}
+	}
+	else
+	{
+		tree->left = tRemove(tree->left, data, compare);
+		tree->right = tRemove(tree->right, data, compare);
+	}
+	
+	return balance(tree);
+
 }
 
 int printTree(TNode* tree, int level, void (*print)(void*))
@@ -318,7 +483,7 @@ int printTree(TNode* tree, int level, void (*print)(void*))
 	{
 		print(getData(tree));	
 	}
-	printf("\n");
+	printf(":%d\n",balanceFactor(tree));
 
 	if(tree != NULL) // if we have a left child
 	{
@@ -328,3 +493,17 @@ int printTree(TNode* tree, int level, void (*print)(void*))
 
 	return 0;
 }
+
+
+void destroyTree(TNode* root, void (*destroy)(void*))
+{
+	if(root == NULL || destroy == NULL);
+	{
+		return;
+	}
+	destroyTree(root->left,destroy);
+	destroyTree(root->right,destroy);
+	destroyNode(root,destroy);
+	return;
+}
+
