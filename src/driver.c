@@ -204,6 +204,10 @@ int menu()
 			printf("filename: ");
 			fgets(fname, 255, stdin);
 			fname[strlen(fname)-1] = '\0';
+			if(root != NULL)
+			{
+				destroyTree(root, &delete);
+			}
 			root = construct(fname);
 			if(root != NULL)
 			{
